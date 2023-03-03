@@ -31,7 +31,7 @@ class Table(val map:Map<String, EnumSet<WithNot>> = hashMapOf()):TreeMap<String,
             }
             .collect(Collectors.joining(""))
 
-        return str1.compareTo(str2)
+        return str2.compareTo(str1)
     }
 
     override fun equals(other: Any?): Boolean =

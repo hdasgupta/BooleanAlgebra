@@ -1,0 +1,48 @@
+<center th:if="${!results.isEmpty()}">
+    <br />
+    <h5>
+        <u>Truth Table</u>
+    </h5>
+    <table border="1">
+        <thead>
+        <tr>
+            <th height="30" width="50" th:each="variable, stat :${variables}">
+                <center>
+                    <b>
+                        <u>[[${variable}]]</u>
+                    </b>
+                </center>
+            </th>
+            <th height="30" width="100" >
+                <center>
+                    <b>
+                        <u><i>Output</i></u>
+                    </b>
+                </center>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="result, stat :${results}">
+            <td th:each="variable, stat :${variables}">
+                <center>
+                    [[${result.get(variable)?1:0}]]
+                </center>
+
+            </td>
+            <td>
+                <center>
+                    <i>
+                        [[${result.get('output')?1:0}]]
+                    </i>
+
+                </center>
+
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</center>
+<div  th:if="${results.isEmpty()}" style="color: red">
+    <center>ERROR OCCURED</center>
+</div>

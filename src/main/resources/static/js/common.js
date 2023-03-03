@@ -1,25 +1,17 @@
 var currScript = $('script[src*=common]'); // or better regexp to get the file name..
 
-console.log("sop"+currScript.attr('data-url-sop'))
-console.log("pos"+currScript.attr('data-url-pos'))
-
-var pathSOP = currScript.attr('data-url-sop');
-
-var pathPOS = currScript.attr('data-url-pos');
+var path = currScript.attr('data-url');
 
 var autoload = currScript.attr('data-autoload');
 
 const currPath = $(location).attr("href")
 
-const urlSOP = currPath.substring(0, currPath.lastIndexOf('/')+1)+pathSOP
-
-const urlPOS = currPath.substring(0, currPath.lastIndexOf('/')+1)+pathPOS
+const url = currPath.substring(0, currPath.lastIndexOf('/')+1)+path
 
 
 var lastResponse = {}
 var responses = {
-    "#tableSOP" : "",
-    "#tablePOS" : ""
+    "#table" : ""
 }
 var successes = []
 
@@ -77,15 +69,12 @@ function onChange(e) {
         var obj = {}
         props = ['formula', 'formula1', 'formula2'].filter(prop=>$('#'+prop).val())
         props.forEach(prop=>obj[prop]=$('#'+prop).val())
-        load("#tableSOP", obj, urlSOP, !autoload, onSuccess, onError)
-        load("#tablePOS", obj, urlPOS, !autoload, onSuccess, onError)
+        load("#table", obj, url, !autoload, onSuccess, onError)
     })
 }
 
 function generate(elem) {
     onReset()
-    $('#tablePOS').html('')
-    $('#tableSOP').html('')
     $(elem).html(responses[elem])
     /*$("#generatePOS").attr("disabled", "disabled")
     $("#generateSOP").attr("disabled", "disabled")*/
@@ -94,8 +83,7 @@ function generate(elem) {
 function onError() {
     $("#success").hide()
     $("#error").show()
-    $("#generatePOS").attr("disabled", "disabled")
-    $("#generateSOP").attr("disabled", "disabled")
+    $("#generate").attr("disabled", "disabled")
 }
 
 function onReset() {
@@ -104,13 +92,12 @@ function onReset() {
 }
 
 function onSuccess() {
-    if(responses["#tableSOP"].indexOf("ERROR")>=0 || responses["#tablePOS"].indexOf("ERROR")>=0) {
+    if(responses["#table"].indexOf("ERROR")>=0) {
         onError()
     } else {
         $("#success").show()
         $("#error").hide()
-        $("#generatePOS").removeAttr("disabled")
-        $("#generateSOP").removeAttr("disabled")
+        $("#generate").removeAttr("disabled")
     }
 }
 
