@@ -1,0 +1,84 @@
+<h5  th:if="${!results.isEmpty()}">
+    Simplification
+</h5>
+<table th:if="${!results.isEmpty()}" border="0">
+    <tr>
+        <td id="diff_formula" colspan="2">
+            <div>
+                [[${formula}]]
+            </div>
+        </td>
+    </tr>
+    <tr th:each="result, stat :${results}">
+        <td width="120px">
+            <button class="btn btn-secondary" data-toggle="modal" th:onclick="modal[[${stat.count}]]()">Step details
+                <script>
+                    function modal[[${stat.count}]]() {
+                        $('[[${'#modal_'+stat.count}]]').modal('toggle')
+                    }
+                </script>
+            </button>
+            <div class="modal fade" th:id="${'modal_'+stat.count}">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">
+                                Step Details
+                            </h4>
+                            <button type="button" class="close" data-dismiss="modal">
+                                &times;
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <h5>Previous Step : </h5>
+                            <div th:if="${stat.index == 0}">
+                                [[${formula}]]
+                            </div>
+                            <span  th:if="${stat.index > 0}" th:id="${'prevStep_'+stat.count}">
+                                <div>
+                                    [[${results.get(stat.index-1).currentExpression}]]
+                                </div>
+                            </span>
+
+                            <br/>
+
+                            <h5>Change</h5>
+                            <div>
+                                <h6>From Step : </h6>
+                                <div>[[${result.fromExpression}]]</div>
+                                <h6>To Step : </h6>
+                                <div>[[${result.toExpression}]]</div>
+                                <h6>Reason : </h6>
+                                <div>[[${result.reason}]]</div>
+                            </div>
+
+                            <br/>
+
+                            <h5>Current Step : </h5>
+
+                            <div>[[${result.currentExpression}]]</div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </td>
+        <td>
+            <span  th:id="${'result_'+stat.count}">
+                <div>
+                    [[${result.currentExpression}]]
+                </div>
+            </span>
+        </td>
+
+    </tr>
+
+ </table>
+<div  th:if="${results.isEmpty()}" style="color: red">
+    <center>ERROR OCCURED</center>
+</div>
