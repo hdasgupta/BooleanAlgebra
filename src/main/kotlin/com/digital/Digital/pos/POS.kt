@@ -66,14 +66,14 @@ class POS {
         return if(and.size == 1) {
             and[0]
         } else {
-            SubExpression(Operator.And, and)
+            simplifyExpression.and(and)
         }
 
 
     }
 
-    fun allTables(vars: Set<String>): HashSet<Table> {
-        var tables = HashSet<Table>()
+    fun allTables(vars: SortedSet<String>): Tables {
+        var tables = Tables(vars)
 
         vars.forEach {
             if(tables.isEmpty()) {
@@ -83,21 +83,24 @@ class POS {
                 t1[it] = EnumSet.of(WithNot.N)
                 t2[it] = EnumSet.of(WithNot.Y)
 
-                tables = hashSetOf(t1, t2)
+                tables = Tables(vars)
+                tables.add(t1)
+                tables.add(t2)
             } else {
-                tables = tables.stream().flatMap {
+                val t = tables.stream().flatMap {
                         t->
-                        val t1 = Table(t)
-                        val t2 = Table(t)
+                    val t1 = Table(t)
+                    val t2 = Table(t)
 
-                        t1[it] = EnumSet.of(WithNot.N)
-                        t2[it] = EnumSet.of(WithNot.Y)
+                    t1[it] = EnumSet.of(WithNot.N)
+                    t2[it] = EnumSet.of(WithNot.Y)
 
-                        Stream.of(t1, t2)
+                    Stream.of(t1, t2)
 
-                    }
+                }
                     .toList()
-                    .toHashSet()
+                tables = Tables(vars)
+                tables.addAll(t)
             }
         }
 

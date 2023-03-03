@@ -4,9 +4,7 @@ import com.digital.Digital.parser.Expression
 import com.digital.Digital.parser.Input
 import com.digital.Digital.parser.Operator
 import com.digital.Digital.parser.SubExpression
-import com.digital.Digital.simplify.Shorten
-import com.digital.Digital.simplify.Table
-import com.digital.Digital.simplify.WithNot
+import com.digital.Digital.simplify.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import java.util.*
@@ -20,17 +18,21 @@ class SOP {
     @Autowired
     lateinit var shorten: Shorten
 
+    @Autowired
+    lateinit var simplifyExpression: SimplifyExpression
+
     fun canonical(expression: Expression): Expression {
         val vars = shorten.variables(expression)
-        val tables : HashSet<Table> = shorten.createTable(expression)
-        val newTables : HashSet<Table> = HashSet()
+        val tables = shorten.createTable(expression)
+        val newTables  = Tables(vars)
 
         for(table in tables) {
             val othersVars = vars.toMutableSet()
             othersVars.removeAll(table.keys)
-            var _tables : HashSet<Table> = HashSet(listOf(table))
+            var _tables  = Tables(vars)
+            _tables.add(table)
             for (v in othersVars) {
-                _tables = _tables.stream()
+                val t = _tables.stream()
                     .flatMap {
                         val t1 = Table(it)
                         val t2 = Table(it)
@@ -41,13 +43,15 @@ class SOP {
                         Stream.of(t1, t2)
                     }
                     .toList()
-                    .toHashSet()
+                _tables = Tables(vars)
+                _tables.addAll(t)
+
             }
 
             newTables.addAll(_tables)
         }
 
-        val inputs = shorten.variables(expression).stream()
+        val inputs = vars.stream()
             .collect(Collectors.toMap(fun(it)=it, fun(it)= Input(it)))
 
         var or : MutableList<Expression> = mutableListOf()
@@ -68,7 +72,7 @@ class SOP {
                 }
             }
             if(and.isNotEmpty()) {
-                or.add(SubExpression(Operator.And, and))
+                or.add(simplifyExpression.and(and))
             }
         }
 

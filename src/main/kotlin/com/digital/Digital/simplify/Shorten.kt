@@ -8,16 +8,21 @@ import com.digital.Digital.parser.Expression
 import com.digital.Digital.parser.Input
 import com.digital.Digital.parser.Operator
 import com.digital.Digital.parser.SubExpression
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import java.util.Comparator
 import java.util.EnumSet
+import java.util.SortedSet
 import java.util.TreeSet
 
 @Component
 class Shorten {
 
-    fun createTable(exp: Expression) : HashSet<Table> {
-        val tables: HashSet<Table> = HashSet()
+    @Autowired
+    lateinit var simplifyExpression: SimplifyExpression
+
+    fun createTable(exp: Expression) : Tables {
+        val tables = Tables(variables(exp))
         if (exp is SubExpression) {
             if (exp.operator == Operator.Or) {
                 exp.operands.forEach {
@@ -61,7 +66,7 @@ class Shorten {
     }
 
     fun shorten(exp: Expression, steps: Steps) : Expression {
-        val tables : HashSet<Table> = createTable(exp)
+        val tables  = createTable(exp)
 
         val inputs = variables(exp).stream()
             .collect(Collectors.toMap(fun(it)=it, fun(it)=Input(it)))
@@ -87,7 +92,7 @@ class Shorten {
                 }
             }
             if(and.isNotEmpty()) {
-                or.add(SubExpression(Operator.And, and))
+                or.add(simplifyExpression.and(and))
             }
         }
 
@@ -139,14 +144,14 @@ class Shorten {
 
         }
 
-    fun variables(exp: Expression) : Set<String> =
+    fun variables(exp: Expression) : SortedSet<String> =
         if(exp is SubExpression) {
             exp.operands
                 .stream()
                 .flatMap { variables(it).stream() }
                 .toList()
-                .toSet()
+                .toSortedSet()
         } else {
-            setOf((exp as Input).name)
+            sortedSetOf((exp as Input).name)
         }
 }

@@ -186,8 +186,7 @@ class SimplifyExpression {
                                     else ->
                                     {
                                         mutableList.add(
-                                            SubExpression(
-                                                And,
+                                            and(
                                                 mutableListOf(exp, exp2)
                                             )
                                         )
@@ -195,8 +194,7 @@ class SimplifyExpression {
                                 }
                             } else {
                                 mutableList.add(
-                                    SubExpression(
-                                        And,
+                                    and(
                                         mutableListOf(exp, exp2)
                                     )
                                 )
@@ -225,8 +223,7 @@ class SimplifyExpression {
                             else->
                             {
                                 mutableList.add(
-                                    SubExpression(
-                                        And,
+                                    and(
                                         mutableListOf(exp, exp2)
                                     )
                                 )
@@ -234,8 +231,7 @@ class SimplifyExpression {
                         }
                     } else {
                         mutableList.add(
-                            SubExpression(
-                                And,
+                            and(
                                 mutableListOf(exp, exp2)
                             )
                         )
