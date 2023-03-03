@@ -2,6 +2,7 @@ package com.digital.Digital.controller
 
 import com.digital.Digital.parser.Parser
 import com.digital.Digital.parser.Tokenizer
+import com.digital.Digital.pos.POS
 import com.digital.Digital.simplify.Shorten
 import com.digital.Digital.simplify.SimplifyExpression
 import com.digital.Digital.simplify.Step
@@ -31,6 +32,9 @@ class Simplifier {
     @Autowired
     lateinit var sop: SOP
 
+    @Autowired
+    lateinit var pos : POS
+
     @RequestMapping(value = ["/simplifier"])
     fun getTemplate(
         @RequestParam(required = false) formula: String? = null,
@@ -59,6 +63,24 @@ class Simplifier {
         }
 
         return "SimplifiedResult"
+    }
+
+    @RequestMapping(value = ["/simplePOSHtml"])
+    fun getPOSHtml(@RequestParam formula: String, map: ModelMap): String {
+        try {
+            val operand = parser.parse(tokenizer.parse(formula))
+            val steps = Steps(operand.toString())
+            val result = shorten.shorten(simplifyExpression.simplify(operand, steps), steps)
+            val results = steps.steps
+            map["formula"] = operand.toString()
+            map["results"] = ArrayList(results)
+            map["result"] = result.toString()
+            map["canonical"] = pos.canonical(result).toString()
+        } catch (t: Throwable) {
+            map["results"] = ArrayList<Step>()
+        }
+
+        return "SimplifiedPOSResult"
     }
 
 }

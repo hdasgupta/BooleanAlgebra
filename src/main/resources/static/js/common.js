@@ -1,18 +1,29 @@
 var currScript = $('script[src*=common]'); // or better regexp to get the file name..
 
-var path = currScript.attr('data-url');
+console.log("sop"+currScript.attr('data-url-sop'))
+console.log("pos"+currScript.attr('data-url-pos'))
+
+var pathSOP = currScript.attr('data-url-sop');
+
+var pathPOS = currScript.attr('data-url-pos');
 
 var autoload = currScript.attr('data-autoload');
 
 const currPath = $(location).attr("href")
 
-const url = currPath.substring(0, currPath.lastIndexOf('/')+1)+path
+const urlSOP = currPath.substring(0, currPath.lastIndexOf('/')+1)+pathSOP
 
+const urlPOS = currPath.substring(0, currPath.lastIndexOf('/')+1)+pathPOS
 
 
 var lastResponse = {}
-var responses = {}
+var responses = {
+    "#tableSOP" : "",
+    "#tablePOS" : ""
+}
 var successes = []
+
+
 function load(elem, json, url, lateInit = false, succCallBack, errCallBack) {
     if(!lastResponse[url+JSON.stringify(json)]) {
         $(document).ready(function() {
@@ -66,20 +77,25 @@ function onChange(e) {
         var obj = {}
         props = ['formula', 'formula1', 'formula2'].filter(prop=>$('#'+prop).val())
         props.forEach(prop=>obj[prop]=$('#'+prop).val())
-        load("#table", obj, url, !autoload, onSuccess, onError)
+        load("#tableSOP", obj, urlSOP, !autoload, onSuccess, onError)
+        load("#tablePOS", obj, urlPOS, !autoload, onSuccess, onError)
     })
 }
 
 function generate(elem) {
     onReset()
+    $('#tablePOS').html('')
+    $('#tableSOP').html('')
     $(elem).html(responses[elem])
-    $("#generate").attr("disabled", "disabled")
+    /*$("#generatePOS").attr("disabled", "disabled")
+    $("#generateSOP").attr("disabled", "disabled")*/
 }
 
 function onError() {
     $("#success").hide()
     $("#error").show()
-    $("#generate").attr("disabled", "disabled")
+    $("#generatePOS").attr("disabled", "disabled")
+    $("#generateSOP").attr("disabled", "disabled")
 }
 
 function onReset() {
@@ -88,13 +104,13 @@ function onReset() {
 }
 
 function onSuccess() {
-    if(responses["#table"].indexOf("ERROR")>=0) {
+    if(responses["#tableSOP"].indexOf("ERROR")>=0 || responses["#tablePOS"].indexOf("ERROR")>=0) {
         onError()
     } else {
         $("#success").show()
         $("#error").hide()
-        $("#generate").removeAttr("disabled")
-
+        $("#generatePOS").removeAttr("disabled")
+        $("#generateSOP").removeAttr("disabled")
     }
 }
 

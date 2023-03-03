@@ -10,7 +10,7 @@
     <script th:src="@{js/bootstrap.bundle.min.js}"></script>
     <script th:src="@{js/bootstrap-autocomplete.min.js}"></script>
     <script src="extensions/resizable/bootstrap-table-resizable.js"></script>
-    <script th:src="@{js/common.js}"  data-url="simpleHtml"></script>
+    <script th:src="@{js/common.js}"  data-url-sop="simpleHtml" data-url-pos="simplePOSHtml"></script>
     <link rel="stylesheet" th:href="@{css/common.css}">
 
     <title>Convert to SOP Boolean Expression Page</title>
@@ -39,16 +39,14 @@
                aria-label="Large"
                onkeyup="onChange(event, $('#auto').val()=='on')" autocomplete="on"
         >[[${formula}]]</textarea>
-        <div class="input-group-append"  data-toggle="buttons">
-            <label class="btn btn-primary" style="height: 100%;" onclick="onChange(event, $('#auto').val()=='on')">
-                <input type="checkbox" id="auto" autocomplete="off"> Auto
-            </label>
+        <div class="input-group-append">
+            <button disabled class="btn btn-primary" type="button" id="generatePOS" onclick="generate('#tablePOS')">POS</button>
         </div>
         <div class="input-group-append">
-            <button disabled class="btn btn-primary" type="button" id="generate" onclick="generate('#table')">SOP</button>
+            <button disabled class="btn btn-primary" type="button" id="generateSOP" onclick="generate('#tableSOP')">SOP</button>
         </div>
         <div class="input-group-append">
-            <button class="btn btn-primary" type="button" onclick="generate('#table')" data-toggle="modal" data-target="#help">Help</button>
+            <button class="btn btn-primary" type="button" onclick="generate('#tableSOP')" data-toggle="modal" data-target="#help">Help</button>
         </div>
     </div>
     <div class="alert alert-success alert-dismissible fade show" id="success">
@@ -59,13 +57,20 @@
     </div>
 
 
-<div id="table">
+<div id="tableSOP">
     <script>
         if(!!'[[${formula}]]') {
-            load("#table", {'formula': '[[${formula}]]'}, "[[${request.scheme + '://' + request.serverName + ':' + request.serverPort + request.contextPath + '/simpleHtml'}]]")
+            load("#tableSOP", {'formula': '[[${formula}]]'}, "[[${request.scheme + '://' + request.serverName + ':' + request.serverPort + request.contextPath + '/simpleHtml'}]]")
         }
     </script>
 </div>
+    <div id="tablePOS">
+        <script>
+        if(!!'[[${formula}]]') {
+            load("#tablePOS", {'formula': '[[${formula}]]'}, "[[${request.scheme + '://' + request.serverName + ':' + request.serverPort + request.contextPath + '/simplePOSHtml'}]]")
+        }
+    </script>
+    </div>
 
 <div class="modal fade" id="help">
     <div class="modal-dialog modal-lg">
