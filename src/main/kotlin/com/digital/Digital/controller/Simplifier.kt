@@ -6,6 +6,7 @@ import com.digital.Digital.simplify.Shorten
 import com.digital.Digital.simplify.SimplifyExpression
 import com.digital.Digital.simplify.Step
 import com.digital.Digital.simplify.Steps
+import com.digital.Digital.sop.SOP
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
@@ -26,6 +27,9 @@ class Simplifier {
 
     @Autowired
     lateinit var tokenizer: Tokenizer
+
+    @Autowired
+    lateinit var sop: SOP
 
     @RequestMapping(value = ["/simplifier"])
     fun getTemplate(
@@ -49,6 +53,7 @@ class Simplifier {
             map["formula"] = operand.toString()
             map["results"] = ArrayList(results)
             map["result"] = result.toString()
+            map["canonical"] = sop.canonical(result).toString()
         } catch (t: Throwable) {
             map["results"] = ArrayList<Step>()
         }

@@ -15,12 +15,13 @@ import java.util.TreeSet
 
 @Component
 class Shorten {
-    fun shorten(exp: Expression, steps: Steps) : Expression {
-        val tables: MutableList<Map<String, EnumSet<WithNot>>> = mutableListOf()
+
+    fun createTable(exp: Expression) : HashSet<Table> {
+        val tables: HashSet<Table> = HashSet()
         if (exp is SubExpression) {
             if (exp.operator == Operator.Or) {
                 exp.operands.forEach {
-                    val table : MutableMap<String, EnumSet<WithNot>> = mutableMapOf()
+                    val table = Table()
                     if(it is SubExpression) {
                         varTable(it, table)
                     } else {
@@ -30,31 +31,37 @@ class Shorten {
                             table[it.name]= EnumSet.of(WithNot.N)
                         }
                     }
-                    tables.add(table.toSortedMap())
+                    tables.add(table)
                 }
             } else if(exp.operator == Operator.And) {
-                val table : MutableMap<String, EnumSet<WithNot>> = mutableMapOf()
+                val table = Table()
                 varTable(exp, table)
-                tables.add(table.toSortedMap())
+                tables.add(table)
             } else if(exp.operator == Operator.Not) {
-                val table : MutableMap<String, EnumSet<WithNot>> = mutableMapOf()
+                val table = Table()
                 val op = exp.operands[0] as Input
                 if(table.containsKey(op.name)) {
                     table[op.name]?.add(WithNot.Y)
                 } else {
                     table[op.name]= EnumSet.of(WithNot.Y)
                 }
-                tables.add(table.toSortedMap())
+                tables.add(table)
             } else {
-                val table : MutableMap<String, EnumSet<WithNot>> = mutableMapOf()
+                val table = Table()
                 if(table.containsKey((exp as Input).name)) {
                     table[exp.name]?.add(WithNot.N)
                 } else {
                     table[exp.name]= EnumSet.of(WithNot.N)
                 }
-                tables.add(table.toSortedMap())
+                tables.add(table)
             }
         }
+
+        return tables
+    }
+
+    fun shorten(exp: Expression, steps: Steps) : Expression {
+        val tables : HashSet<Table> = createTable(exp)
 
         val inputs = variables(exp).stream()
             .collect(Collectors.toMap(fun(it)=it, fun(it)=Input(it)))
@@ -64,7 +71,7 @@ class Shorten {
         val reason : MutableMap<Int, String> = mutableMapOf()
 
         for(i in tables.indices) {
-            val map = tables[i]
+            val map = tables.toList()[i]
             var and : MutableList<Expression> = mutableListOf()
             for(key in map.keys) {
                 if(map[key]?.size == 1) {
