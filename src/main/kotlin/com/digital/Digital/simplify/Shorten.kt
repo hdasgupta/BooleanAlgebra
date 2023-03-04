@@ -28,12 +28,21 @@ class Shorten {
                 exp.operands.forEach {
                     val table = Table()
                     if(it is SubExpression) {
-                        varTable(it, table)
+                        if(it.operator == Operator.Not && it.operands[0] is Input) {
+                            if(table.containsKey((it.operands[0] as Input).name)) {
+                                table[(it.operands[0] as Input).name]?.add(WithNot.N)
+                            } else {
+                                table[(it.operands[0] as Input).name]= EnumSet.of(WithNot.N)
+                            }
+                        } else {
+                            varTable(it, table)
+                        }
+
                     } else {
                         if(table.containsKey((it as Input).name)) {
-                            table[it.name]?.add(WithNot.N)
+                            table[it.name]?.add(WithNot.Y)
                         } else {
-                            table[it.name]= EnumSet.of(WithNot.N)
+                            table[it.name]= EnumSet.of(WithNot.Y)
                         }
                     }
                     tables.add(table)
@@ -46,17 +55,17 @@ class Shorten {
                 val table = Table()
                 val op = exp.operands[0] as Input
                 if(table.containsKey(op.name)) {
-                    table[op.name]?.add(WithNot.Y)
+                    table[op.name]?.add(WithNot.N)
                 } else {
-                    table[op.name]= EnumSet.of(WithNot.Y)
+                    table[op.name]= EnumSet.of(WithNot.N)
                 }
                 tables.add(table)
             } else {
                 val table = Table()
                 if(table.containsKey((exp as Input).name)) {
-                    table[exp.name]?.add(WithNot.N)
+                    table[exp.name]?.add(WithNot.Y)
                 } else {
-                    table[exp.name]= EnumSet.of(WithNot.N)
+                    table[exp.name]= EnumSet.of(WithNot.Y)
                 }
                 tables.add(table)
             }
@@ -80,7 +89,7 @@ class Shorten {
             var and : MutableList<Expression> = mutableListOf()
             for(key in map.keys) {
                 if(map[key]?.size == 1) {
-                    if(map[key]?.contains(WithNot.Y) == true) {
+                    if(map[key]?.contains(WithNot.N) == true) {
                         and.add(SubExpression(Operator.Not, mutableListOf(inputs[key]!!)))
                     } else {
                         and.add(inputs[key]!!)

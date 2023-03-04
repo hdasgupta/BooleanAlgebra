@@ -26,7 +26,7 @@ class DigitalApplicationTests {
 
 	@Test
 	fun contextLoads() {
-		val exp = "AB+(A'B+B')'B+C"
+		val exp = "A+B'"
 		val e = parser.parse(
 			tokenizer.parse(exp)
 		)

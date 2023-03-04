@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+
+    <!-- Popper -->
+    <link rel="stylesheet" th:href="@{css/bootstrap.min.css}">
+    <script th:src="@{js/jquery-3.6.0.min.js}"></script>
+    <script th:src="@{js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{js/bootstrap-autocomplete.min.js}"></script>
+    <script src="extensions/resizable/bootstrap-table-resizable.js"></script>
+    <script th:src="@{js/common.js}"  data-url="truthTable2Exp"></script>
+    <link rel="stylesheet" th:href="@{css/common.css}">
+
+    <title>Convert to [[${page}]] Boolean Expression Page</title>
+</head>
+<body>
+
+    <div class="input-group input-group-lg has-error has-feedback nm">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon1">
+                <table>
+                    <tr>
+                        <td style="vertical-align: middle;padding: 0;margin: 0;">Output</td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align: middle;padding: 0;margin: 0;">Boolean</td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align: middle;padding: 0;margin: 0;">Expression</td>
+                    </tr>
+                </table>
+            </span>
+        </div>
+        <textarea readonly type="text" tabindex="1"
+               class="form-control basicAutoComplete cfc" th:id="formula" th:name="formula"
+               placeholder="Enter Boolean Expression"
+               aria-label="Large"
+               onkeyup="onChange(event, $('#auto').val()=='on')" autocomplete="on"
+        >[[${formula}]]</textarea>
+    </div>
+
+    <form method="post" action="/truthTable2Exp">
+        <input type="number" tabindex="2"
+               class="form-control basicAutoComplete cfc"
+               th:id="variable"
+               th:name="variable"
+               th:value="${variable}"
+               placeholder="Enter Number of Variable"
+               onchange="$('#generate').removeAttr('disabled')"
+        >
+        <button disabled class="btn btn-primary" type="submit" id="generate" td:value="${variable}" onclick="generate('#table')">update</button>
+
+    </form>
+
+
+
+<div id="table">
+    <center th:if="${!results.isEmpty()}">
+        <br/>
+
+        <a class="btn btn-primary" th:href="@{/simplifier(page=SOP,formula=${formula})}">Canonical SOP</a>
+        &nbsp;
+        &nbsp;
+        &nbsp;
+        <a class="btn btn-primary" th:href="@{/simplifier(page=POS,formula=${formula})}">Canonical POS</a>
+        <br />
+        <h5>
+            <u>Truth Table</u>
+        </h5>
+        <form id="truthTable" method="post" action="/truthTable2Exp">
+            <input type="hidden" name="output" id="output">
+            <input type="hidden" name="variable" id="ttVariable">
+            <table border="1">
+                <thead>
+                <tr>
+                    <th height="30" width="50" th:each="variable, stat :${variables}">
+                        <center>
+                            <b>
+                                <u>[[${variable}]]</u>
+                            </b>
+                        </center>
+                    </th>
+                    <th height="30" width="100" >
+                        <center>
+                            <b>
+                                <u><i>Output</i></u>
+                            </b>
+                        </center>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="result, stat :${results}">
+                    <td th:each="variable :${variables}">
+                        <center>
+                            [[${result.get(variable)?1:0}]]
+                        </center>
+
+                    </td>
+                    <td>
+                        <center>
+                            <i>
+                                <input type="checkbox"
+                                       th:id="${'out_'+stat.count}"
+
+                                       th:if="${output==null||output.charAt(stat.count-1).toString().equals('0')}"
+
+                                       th:onClick="expression()"
+                                >
+
+                                <input type="checkbox"
+                                       th:id="${'out_'+stat.count}"
+
+                                       th:if="${output!=null&&output.charAt(stat.count-1).toString().equals('1')}"
+
+                                       checked
+                                       th:onClick="expression()"
+                                >
+
+                            </i>
+
+                        </center>
+
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+        </form>
+
+    </center>
+
+</div>
+</body>
+</html>

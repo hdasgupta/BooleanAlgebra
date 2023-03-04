@@ -1,7 +1,7 @@
-<h5  th:if="${!results.isEmpty()}">
+<h5  th:if="${canonical!=null}">
     Simplification
 </h5>
-<table th:if="${!results.isEmpty()}" border="0">
+<table th:if="${canonical!=null}" border="0">
     <tr>
         <td id="diff_formula" colspan="2">
             <div>
@@ -89,6 +89,6 @@
     </tr>
 
  </table>
-<div  th:if="${results.isEmpty()}" style="color: red">
+<div  th:if="${canonical==null}" style="color: red">
     <center>ERROR OCCURED</center>
 </div>

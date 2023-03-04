@@ -15,6 +15,8 @@ import org.springframework.stereotype.Controller
 import org.springframework.ui.ModelMap
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
+import org.yaml.snakeyaml.util.UriEncoder
+import java.net.URLDecoder
 
 @Controller
 class Simplifier {
@@ -56,7 +58,7 @@ class Simplifier {
     @RequestMapping(value = ["/simpleSOPHtml"])
     fun getDiffHtml(@RequestParam formula: String, map: ModelMap): String {
         try {
-            val operand = parser.parse(tokenizer.parse(formula))
+            val operand = parser.parse(tokenizer.parse(formula.replace("&#39;", "'")))
             val steps = Steps(operand.toString())
             val result = shorten.shorten(simplifyExpression.simplify(operand, steps), steps)
             val results = steps.steps
@@ -74,7 +76,7 @@ class Simplifier {
     @RequestMapping(value = ["/simplePOSHtml"])
     fun getPOSHtml(@RequestParam formula: String, map: ModelMap): String {
         try {
-            val operand = parser.parse(tokenizer.parse(formula))
+            val operand = parser.parse(tokenizer.parse(formula.replace("&#39;", "'")))
             val steps = Steps(operand.toString())
             val result = shorten.shorten(simplifyExpression.simplify(operand, steps), steps)
             val results = steps.steps
@@ -92,7 +94,7 @@ class Simplifier {
     @RequestMapping(value = ["/simpleTruth TableHtml"])
     fun getTTHtml(@RequestParam formula: String, map: ModelMap): String {
         try {
-            val operand = parser.parse(tokenizer.parse(formula))
+            val operand = parser.parse(tokenizer.parse(formula.replace("&#39;", "'")))
             val steps = Steps(operand.toString())
             val result = shorten.shorten(simplifyExpression.simplify(operand, steps), steps)
             val results = steps.steps

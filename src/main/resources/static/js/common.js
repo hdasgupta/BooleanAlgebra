@@ -143,3 +143,21 @@ function loadVal(elem, json, url) {
 
     }
 }
+
+function expression() {
+    var count = Math.pow(2, $('#variable').val())
+    var result = ""
+
+    for (var i = 0; i < count; i++) {
+        if ($('#out_'+(i+1)).is(':checked')) {
+            result += '1'
+        } else {
+            result += '0'
+        }
+    }
+
+    $('#output').val(result)
+    $('#ttVariable').val($('#variable').val())
+
+    $('#truthTable').submit()
+}
