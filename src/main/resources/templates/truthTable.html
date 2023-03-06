@@ -1,4 +1,4 @@
-<center th:if="${canonical!=null}">
+<center th:if="${!results.isEmpty()}">
     <br />
     <h5>
         <u>Truth Table</u>
@@ -43,6 +43,6 @@
         </tbody>
     </table>
 </center>
-<div  th:if="${canonical==null}" style="color: red">
+<div  th:if="${results.isEmpty()}" style="color: red">
     <center>ERROR OCCURED</center>
 </div>

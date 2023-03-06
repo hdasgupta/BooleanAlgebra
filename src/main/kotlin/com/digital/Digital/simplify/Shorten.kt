@@ -89,7 +89,7 @@ class Shorten {
             var and : MutableList<Expression> = mutableListOf()
             for(key in map.keys) {
                 if(map[key]?.size == 1) {
-                    if(map[key]?.contains(WithNot.N) == true) {
+                    if(map[key]?.contains(WithNot.Y) == true) {
                         and.add(SubExpression(Operator.Not, mutableListOf(inputs[key]!!)))
                     } else {
                         and.add(inputs[key]!!)
