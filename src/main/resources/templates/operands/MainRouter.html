@@ -1,0 +1,32 @@
+<span th:fragment="route(operand, root)" >
+    <div th:if="${operand instanceof T(com.digital.Digital.parser.SubExpression) && operand.operands.size==1}"
+         th:remove="tag">
+        <div
+                th:replace="~{operands/Fragments :: unary(operator=${operand.operator}, operands=${operand.operands}, root=${root})}"
+                th:remove="tag">
+        </div>
+
+    </div>
+
+    <div th:if="${operand instanceof T(com.digital.Digital.parser.SubExpression) && operand.operands.size>1}"
+         th:remove="tag">
+        <div
+                th:replace="~{operands/Fragments :: binary(operator=${operand.operator}, operands=${operand.operands}, root=${root})}"
+                 th:remove="tag">
+
+        </div>
+
+    </div>
+
+
+    <div th:if="${operand instanceof T(com.digital.Digital.parser.Input)}"
+         th:remove="tag">
+        <div
+                th:replace="~{operands/Fragments :: variable(name=${operand.name}, root=${root})}"
+                 th:remove="tag">
+
+        </div>
+
+    </div>
+
+</span>

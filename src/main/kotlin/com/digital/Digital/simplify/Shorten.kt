@@ -1,6 +1,9 @@
 package com.digital.Digital.simplify
 
 
+import com.digital.Digital.common.queue
+import com.digital.Digital.common.shortQ
+import com.digital.Digital.common.simpleQ
 import java.util.stream.Collectors
 
 
@@ -75,6 +78,9 @@ class Shorten {
     }
 
     fun shorten(exp: Expression, steps: Steps) : Expression {
+        if(shortQ[exp.toString()]!=null) {
+            return shortQ[exp.toString()]!!
+        }
         val tables  = createTable(exp)
 
         val inputs = variables(exp).stream()
@@ -89,7 +95,7 @@ class Shorten {
             var and : MutableList<Expression> = mutableListOf()
             for(key in map.keys) {
                 if(map[key]?.size == 1) {
-                    if(map[key]?.contains(WithNot.Y) == true) {
+                    if(map[key]?.contains(WithNot.N) == true) {
                         and.add(SubExpression(Operator.Not, mutableListOf(inputs[key]!!)))
                     } else {
                         and.add(inputs[key]!!)
@@ -115,16 +121,23 @@ class Shorten {
             SubExpression(Operator.Or, or)
         }
 
-        if(reason.isNotEmpty()) {
+        if(!exp.deepEquals(ex)) {
+            queue[exp.toString()] =exp
+            queue[ex.toString()] = ex
             steps.add(Step(
                 exp.toString(),
                 ex.toString(),
+                if(reason.isNotEmpty())
 
                         "Some parts are not required as "+
                         reason.values.stream().map { "$it.$it' = 0" }.toList()+
                         " respectfully."
+                else
+                    "Shorten Expression"
             ))
         }
+
+        shortQ[exp.toString()] = ex
 
         return ex
     }
@@ -135,17 +148,17 @@ class Shorten {
                 if(op is SubExpression) {
                     if(op.operator == Operator.Not) {
                         if(table.containsKey((op.operands[0] as Input).name)) {
-                            table[(op.operands[0] as Input).name]?.add(WithNot.Y)
+                            table[(op.operands[0] as Input).name]?.add(WithNot.N)
                         } else {
-                            table[(op.operands[0] as Input).name]= EnumSet.of(WithNot.Y)
+                            table[(op.operands[0] as Input).name]= EnumSet.of(WithNot.N)
                         }
 
                     }
                 } else {
                     if(table.containsKey((op as Input).name)) {
-                        table[op.name]?.add(WithNot.N)
+                        table[op.name]?.add(WithNot.Y)
                     } else {
-                        table[op.name]= EnumSet.of(WithNot.N)
+                        table[op.name]= EnumSet.of(WithNot.Y)
                     }
                 }
             }

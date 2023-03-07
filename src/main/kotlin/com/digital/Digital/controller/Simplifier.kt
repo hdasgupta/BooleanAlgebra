@@ -1,5 +1,8 @@
 package com.digital.Digital.controller
 
+import com.digital.Digital.common.queue
+import com.digital.Digital.common.stepsQ
+import com.digital.Digital.parser.Expression
 import com.digital.Digital.parser.Parser
 import com.digital.Digital.parser.Tokenizer
 import com.digital.Digital.pos.POS
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.yaml.snakeyaml.util.UriEncoder
 import java.net.URLDecoder
+import java.util.concurrent.PriorityBlockingQueue
 
 @Controller
 class Simplifier {
@@ -56,16 +60,32 @@ class Simplifier {
     }
 
     @RequestMapping(value = ["/simpleSOPHtml"])
-    fun getDiffHtml(@RequestParam formula: String, map: ModelMap): String {
+    fun getDiffHtml(
+        @RequestParam formula: String,
+        map: ModelMap,
+        req: HttpServletRequest): String {
         try {
             val operand = parser.parse(tokenizer.parse(formula.replace("&#39;", "'")))
-            val steps = Steps(operand.toString())
-            val result = shorten.shorten(simplifyExpression.simplify(operand, steps), steps)
+            var steps:Steps =  Steps(operand.toString())
+            val simpl = simplifyExpression.simplify(operand, steps)
+            queue[simpl.toString()] = simpl
+            val result = shorten.shorten(simpl, steps)
+            queue[result.toString()] = result
+
+            if(stepsQ[formula.replace("&#39;", "'")]!=null) {
+                steps = stepsQ[formula.replace("&#39;", "'")]!!
+            } else {
+                stepsQ[formula.replace("&#39;", "'")] = steps
+            }
             val results = steps.steps
+
+            map["request"] = req
             map["formula"] = operand.toString()
             map["results"] = ArrayList(results)
             map["result"] = result.toString()
-            map["canonical"] = sop.canonical(result).toString()
+            val canonical = sop.canonical(result)
+            queue[canonical.toString()] = canonical
+            map["canonical"] = canonical.toString()
         } catch (t: Throwable) {
             map["results"] = ArrayList<Step>()
         }
@@ -74,16 +94,32 @@ class Simplifier {
     }
 
     @RequestMapping(value = ["/simplePOSHtml"])
-    fun getPOSHtml(@RequestParam formula: String, map: ModelMap): String {
+    fun getPOSHtml(
+        @RequestParam formula: String,
+        map: ModelMap,
+        req: HttpServletRequest): String {
         try {
             val operand = parser.parse(tokenizer.parse(formula.replace("&#39;", "'")))
-            val steps = Steps(operand.toString())
-            val result = shorten.shorten(simplifyExpression.simplify(operand, steps), steps)
+            var steps = Steps(operand.toString())
+            val simpl = simplifyExpression.simplify(operand, steps)
+            queue[simpl.toString()] = simpl
+            val result = shorten.shorten(simpl, steps)
+            queue[result.toString()] = result
+
+            if(stepsQ[formula.replace("&#39;", "'")]!=null) {
+                steps = stepsQ[formula.replace("&#39;", "'")]!!
+            } else {
+                stepsQ[formula.replace("&#39;", "'")] = steps
+            }
+
             val results = steps.steps
+            map["request"] = req
             map["formula"] = operand.toString()
             map["results"] = ArrayList(results)
             map["result"] = result.toString()
-            map["canonical"] = pos.canonical(result).toString()
+            val canonical = pos.canonical(result)
+            queue[canonical.toString()] = canonical
+            map["canonical"] = canonical.toString()
         } catch (t: Throwable) {
             map["results"] = ArrayList<Step>()
         }
@@ -95,12 +131,22 @@ class Simplifier {
     fun getTTHtml(@RequestParam formula: String, map: ModelMap): String {
         try {
             val operand = parser.parse(tokenizer.parse(formula.replace("&#39;", "'")))
+            queue[formula.replace("&#39;", "'")] = operand
             val steps = Steps(operand.toString())
-            val result = shorten.shorten(simplifyExpression.simplify(operand, steps), steps)
-            val results = steps.steps
+            val simpl = simplifyExpression.simplify(operand, steps)
+            queue[simpl.toString()] = simpl
+            val result = shorten.shorten(simpl, steps)
+            queue[result.toString()] = result
+
+            if(stepsQ[formula.replace("&#39;", "'")]!=null) {
+
+            } else {
+                stepsQ[formula.replace("&#39;", "'")] = steps
+            }
+            val results = truthTable.get(result)
             map["formula"] = operand.toString()
             map["variables"] = shorten.variables(operand)
-            map["results"] = truthTable.get(result)
+            map["results"] = results
         } catch (t: Throwable) {
             map["results"] = ArrayList<Step>()
         }

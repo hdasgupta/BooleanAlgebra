@@ -1,5 +1,6 @@
 package com.digital.Digital.parser
 
+import com.digital.Digital.common.queue
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import java.util.Stack
@@ -36,6 +37,7 @@ class Parser {
         autoPop(operators, operands)
 
         if (operands.size == 1) {
+            queue[operands[0].toString()] = operands[0]
             return operands[0]
         } else {
             throw RuntimeException("Invalid Expression")

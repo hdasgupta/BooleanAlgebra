@@ -1,5 +1,7 @@
 package com.digital.Digital.pos
 
+import com.digital.Digital.common.posQ
+import com.digital.Digital.common.queue
 import com.digital.Digital.parser.Expression
 import com.digital.Digital.parser.Input
 import com.digital.Digital.parser.Operator
@@ -25,6 +27,9 @@ class POS {
     lateinit var simplifyExpression: SimplifyExpression
 
     fun canonical(expression: Expression): Expression {
+        if(posQ[expression.toString()]!=null) {
+            return posQ[expression.toString()]!!
+        }
         val tables = shorten.createTable(
             sop.canonical(
                 simplifyExpression.simplify(
@@ -48,7 +53,7 @@ class POS {
             var or : MutableList<Expression> = mutableListOf()
             for(key in map.keys) {
                 if(map[key]?.size == 1) {
-                    if(map[key]?.contains(WithNot.Y) == true) {
+                    if(map[key]?.contains(WithNot.N) == true) {
                         or.add(SubExpression(Operator.Not, mutableListOf(inputs[key]!!)))
                     } else {
                         or.add(inputs[key]!!)
@@ -64,6 +69,7 @@ class POS {
         }
 
         return if(and.size == 1) {
+            posQ[and[0].toString()] = and[0]
             and[0]
         } else {
             simplifyExpression.and(and)

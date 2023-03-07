@@ -88,7 +88,7 @@ class TruthTable2Exp {
                                 IntStream.range(0, str.length)
                                     .filter { i -> str[i] != strNext[i] }.count() == 1L
                             }
-                            if (similars != null && similars.isNotEmpty()) {
+                            if (!similars.isNullOrEmpty()) {
                                 similars.forEach {
                                     similar->
                                     val newStr = IntStream.range(0, str.length)
@@ -132,12 +132,12 @@ class TruthTable2Exp {
                 } else if(included.isEmpty()) {
                     "0"
                 } else {
-                    included.keys.map { str ->
+                    included.keys.joinToString("+") { str ->
                         IntStream.range(0, variable)
                             .filter { str[it] != '_' }
                             .mapToObj { variables[it] + if (str[it] == '1') "" else "'" }
                             .collect(Collectors.joining("."))
-                    }.joinToString("+")
+                    }
                 }
             }
 

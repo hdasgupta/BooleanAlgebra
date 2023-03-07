@@ -1,5 +1,7 @@
 package com.digital.Digital.sop
 
+import com.digital.Digital.common.queue
+import com.digital.Digital.common.sopQ
 import com.digital.Digital.parser.Expression
 import com.digital.Digital.parser.Input
 import com.digital.Digital.parser.Operator
@@ -22,6 +24,9 @@ class SOP {
     lateinit var simplifyExpression: SimplifyExpression
 
     fun canonical(expression: Expression): Expression {
+        if(sopQ[expression.toString()]!=null) {
+            return sopQ[expression.toString()]!!
+        }
         val vars = shorten.variables(expression)
         val tables = shorten.createTable(expression)
         val newTables  = Tables(vars)
@@ -61,7 +66,7 @@ class SOP {
             var and : MutableList<Expression> = mutableListOf()
             for(key in map.keys) {
                 if(map[key]?.size == 1) {
-                    if(map[key]?.contains(WithNot.Y) == true) {
+                    if(map[key]?.contains(WithNot.N) == true) {
                         and.add(SubExpression(Operator.Not, mutableListOf(inputs[key]!!)))
                     } else {
                         and.add(inputs[key]!!)
@@ -77,6 +82,7 @@ class SOP {
         }
 
         return if(or.size == 1) {
+            sopQ[or[0].toString()] = or[0]
             or[0]
         } else {
             SubExpression(Operator.Or, or)

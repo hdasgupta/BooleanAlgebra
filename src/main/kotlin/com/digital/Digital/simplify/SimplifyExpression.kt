@@ -1,5 +1,7 @@
 package com.digital.Digital.simplify
 
+import com.digital.Digital.common.queue
+import com.digital.Digital.common.simpleQ
 import com.digital.Digital.parser.Expression
 import com.digital.Digital.parser.Input
 import com.digital.Digital.parser.Operator
@@ -11,8 +13,10 @@ import java.util.stream.Stream
 @Component
 class SimplifyExpression {
     fun simplify(exp:Expression, steps:Steps): Expression =
-        if(exp is SubExpression) {
-            when(exp.operator) {
+        if(simpleQ[exp.toString()]!=null) {
+            simpleQ[exp.toString()]!!
+        } else if(exp is SubExpression) {
+            val e = when(exp.operator) {
                 Or ->
                     if(exp.operands.stream().allMatch { it is Input || (it is SubExpression && it.operator==Not && it.operands[0] is Input) }) {
                         exp
@@ -21,6 +25,8 @@ class SimplifyExpression {
                             Or,
                             or(exp, steps).toList().toMutableList()
                         )
+                        queue[exp.toString()] =exp
+                        queue[ex.toString()] = ex
                         steps.add(Step(exp.toString(), ex.toString(), "Grouping all Or"))
                         ex
                     }
@@ -33,6 +39,8 @@ class SimplifyExpression {
 
                         val ex = and(exp, steps)
 
+                        queue[exp.toString()] =exp
+                        queue[ex.toString()] = ex
                         steps.add(Step(exp.toString(), ex.toString(), "Distributing And"))
                         ex
                     }
@@ -42,12 +50,19 @@ class SimplifyExpression {
                     } else {
                         val input = exp.operands[0] as SubExpression
                         val ex = not(input, steps)
+
+                        queue[exp.toString()] =exp
+                        queue[ex.toString()] = ex
                         steps.add(Step(exp.toString(), ex.toString(), "Ungroup Not"))
                         ex
                     }
 
             }
+
+            simpleQ[exp.toString()] = e
+            e
         } else {
+            simpleQ[exp.toString()] = exp
             exp
         }
 

@@ -13,6 +13,12 @@
     <script th:src="@{js/common.js}"  th:data-url="${'simple'+page+'Html'}"></script>
     <link rel="stylesheet" th:href="@{css/common.css}">
 
+    <script>
+        $( ".bar" ).on( "resize", function( event, ui ) {
+            $( ".img" ).attr( "width", ui.size.width -4 );
+        } );
+
+    </script>
     <title>Convert to [[${page}]] Boolean Expression Page</title>
 </head>
 <body>

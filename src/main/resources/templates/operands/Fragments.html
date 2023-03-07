@@ -1,0 +1,52 @@
+
+<table border="0" cellpadding="0" th:fragment="unary (operator, operands, root)">
+    <tr>
+        <td colspan="3" style="vertical-align: middle;padding: 0;margin: 0;">
+            <hr width="100%">
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: middle;padding: 0;margin: 0;"
+            th:if="${operands[0] instanceof T(com.digital.Digital.parser.SubExpression) && operands[0].operands.size==1}"
+            class="left">
+            (
+        </td>
+        <td style="vertical-align: middle;padding: 0;margin: 0;">
+            <div th:replace="~{operands/MainRouter.html :: route(operand=${operands[0]}, root=${false})}"></div>
+        </td>
+        <td style="vertical-align: middle;padding: 0;margin: 0;"
+            th:if="${operands[0] instanceof T(com.digital.Digital.parser.SubExpression) && operands[0].operands.size==1}"
+            class="right">
+            )
+        </td>
+    </tr>
+</table>
+
+<table border="0" cellpadding="0" th:fragment="binary (operator, operands, root)">
+    <tr>
+        <td th:if="${!root}" style="vertical-align: bottom;padding: 0;margin: 0;"
+            class="left">
+            (
+        </td>
+        <div th:each="o, stat: ${operands}" th:remove="tag">
+            <td th:if="${stat.index>0}" style="vertical-align: bottom;padding: 0;margin: 0;">
+                <b style="color:indigo">
+                    [[${operator.symbol}]]
+                </b>
+            </td>
+            <td style="vertical-align: bottom;padding: 0;margin: 0;">
+                <div th:replace="~{operands/MainRouter.html :: route(operand=${o}, root=${false})}"></div>
+            </td>
+        </div>
+        <td th:if="${!root}" style="vertical-align: bottom;padding: 0;margin: 0;"
+            class="right">
+            )
+        </td>
+    </tr>
+</table>
+
+<b th:fragment="variable (name, root)">
+    <i style="color:green" th:if="${name!=null}">
+        [[${name}]]
+    </i>
+</b>

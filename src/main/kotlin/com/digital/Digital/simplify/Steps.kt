@@ -9,19 +9,37 @@ import kotlin.streams.toList
 class Steps(val exp:String, val steps: MutableList<Step> = mutableListOf()) {
 
     fun add(step: Step) : Any =
-        if(steps.isNotEmpty()) {
-            if(!steps.last().toExpression.contains(step.toExpression, false)) {
-                step.currentExpression(this)
-                steps.add(step)
-            } else if(!steps.last().fromExpression.contains(step.fromExpression, false)) {
-                step.currentExpression(this)
-                steps.add(step)
-            } else {
+        if(step.toExpression != step.fromExpression) {
+            if (steps.isNotEmpty()) {
+                if (!steps.last().toExpression.contains(step.toExpression, false)
+                    ||(steps.last().toExpression.contains(step.toExpression, false)
+                            && steps.last().fromExpression.contains(step.fromExpression, false))) {
+                    step.currentExpression(this)
+                    if(step.toExpression != step.fromExpression)
+                       steps.add(step)
+                    else {
 
+                    }
+                } else if (!steps.last().fromExpression.contains(step.fromExpression, false)) {
+                    step.currentExpression(this)
+                    if(step.toExpression != step.fromExpression)
+                        steps.add(step)
+                    else {
+
+                    }
+                } else {
+
+                }
+            } else {
+                step.currentExpression(this)
+                if(step.toExpression != step.fromExpression)
+                    steps.add(step)
+                else {
+
+                }
             }
         } else {
-            step.currentExpression(this)
-            steps.add(step)
+
         }
 
 
