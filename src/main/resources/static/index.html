@@ -5,17 +5,39 @@
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <script src="/js/jquery-3.6.0.min.js"></script>
     <script src="/js/bootstrap.bundle.min.js"></script>
-    <title>Math Lang</title>
+    <title>Boolean Expression Home Page</title>
+    <script>
+        var n
+        function resize() {
+          const height= Math.floor(($(window).height() - $(".heading").height()) / n)
+          const width= $(window).width()
+          $("a.btn-primary").css("width", width);
+          $("a.btn-primary").attr("width", width);
+          $("a.btn-primary").css("height", height);
+          $("a.btn-primary").attr("height", height);
+        }
+
+        $(document).ready(function(){
+          n = $(".btn-group-vertical").children("a").length;
+          resize()
+          $(window).resize(function() {
+              resize()
+          })
+        })
+
+    </script>
 </head>
 <body>
 <center>
-    <h2><u>Boolean Expression Pages</u></h2>
-    <br />
+    <div class="heading">
+        <h2><u>Boolean Expression Pages</u></h2>
+        <br />
+    </div>
     <div class="btn-group-vertical">
-        <a href="/simplifier?page=SOP"  class="btn btn-secondary">Convert to SOP from Boolean Expression Page</a>
-        <a href="/simplifier?page=POS"  class="btn btn-secondary">Convert to POS from Boolean Expression Page</a>
-        <a href="/simplifier?page=Truth Table"  class="btn btn-secondary">Convert to Truth Table from Boolean Expression Page</a>
-        <a href="/truthTable2Exp"  class="btn btn-secondary">Convert from Truth Table to Boolean Expression Page</a>
+        <a href="/simplifier?page=SOP"  class="btn btn-primary">Convert to SOP from Boolean Expression Page</a>
+        <a href="/simplifier?page=POS"  class="btn btn-primary">Convert to POS from Boolean Expression Page</a>
+        <a href="/simplifier?page=Truth Table"  class="btn btn-primary">Convert to Truth Table from Boolean Expression Page</a>
+        <a href="/truthTable2Exp"  class="btn btn-primary">Convert from Truth Table to Boolean Expression Page</a>
     </div>
 </center>
 
